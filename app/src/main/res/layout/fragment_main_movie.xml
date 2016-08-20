@@ -1,0 +1,20 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainMovieFragment"
+    tools:showIn="@layout/activity_main_movie">
+
+    <GridView
+        android:id="@+id/gridView_movie"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:numColumns="auto_fit"
+        android:columnWidth="150dp"
+        android:stretchMode="columnWidth"
+        android:adjustViewBounds="true"
+        android:gravity="center"
+        android:scaleType="centerCrop"
+        />
+
+</FrameLayout>
