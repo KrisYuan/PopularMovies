@@ -4,8 +4,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -63,16 +61,16 @@ public class DetailFragment extends Fragment implements SharedPreferences.OnShar
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
         sp.registerOnSharedPreferenceChangeListener(this);
 
-        Handler myHandler = new Handler(Looper.getMainLooper());
-        Runnable myRunnable = new Runnable() {
-            @Override
-            public void run() {
-                getMovieDetial(mId);
-                getTrailers(mId);
-                getReviews(mId);
-            }
-        };
-        myHandler.post(myRunnable);
+//        Handler myHandler = new Handler(Looper.getMainLooper());
+//        Runnable myRunnable = new Runnable() {
+//            @Override
+//            public void run() {
+//                getMovieDetial(mId);
+//                getTrailers(mId);
+//                getReviews(mId);
+//            }
+//        };
+//        myHandler.post(myRunnable);
 
 
         super.onResume();
@@ -97,11 +95,14 @@ public class DetailFragment extends Fragment implements SharedPreferences.OnShar
         if (arguments != null) {
             mUri = arguments.getParcelable(DetailFragment.DETAIL_URI);
             mId = arguments.getLong(DetailFragment.DETAIL_MOVIE_ID);
-        }else{
+        }
+        else if (getActivity().getIntent() == null || getActivity().getIntent().getData() == null) {
+            return null;
+        }
+        else{
             mUri = getActivity().getIntent().getData();
             mId = getActivity().getIntent().getBundleExtra(DetailFragment.DETAIL_MOVIE_ID).getLong(DetailFragment.DETAIL_MOVIE_ID);
         }
-
 
         if(mId != 0){
             mMovie = getMovieDetial(mId);

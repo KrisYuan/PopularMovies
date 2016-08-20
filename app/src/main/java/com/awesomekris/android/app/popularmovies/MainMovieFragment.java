@@ -29,6 +29,7 @@ public class MainMovieFragment extends Fragment implements LoaderManager.LoaderC
     //public static final String DETAIL_URI = "detail_uri";
     //public static final String GRID_VIEW_STATE = "grid_movie_state";
 
+
     private static final String SELECTED_KEY = "selected_position";
     private static final int MOVIE_LOADER_ID=1;
 
@@ -37,7 +38,8 @@ public class MainMovieFragment extends Fragment implements LoaderManager.LoaderC
     private String mSort;
     private String mRequest;
     private Parcelable mState;
-    private int mPosition = GridView.INVALID_POSITION;
+    private long mDefaultId=0;
+    private long mDefaultMovieId=0;
 
     private static final String SORT_POPULARITY = "popular";
     private static final String SORT_TOP_RATED = "top_rated";
@@ -110,6 +112,9 @@ public class MainMovieFragment extends Fragment implements LoaderManager.LoaderC
                     FetchDataTask fetchReviewTask = new FetchDataTask(getActivity());
                     fetchReviewTask.execute(Long.toString(movieKey),FetchDataTask.MOVIE_REVIEW );
 
+                    mDefaultId = movieId;
+                    mDefaultMovieId = movieKey;
+
                     Uri movieUri = MovieContract.MovieEntry.buildMovieItemUriFromId(movieId);
                     ((ShowMovieDetailCallBack)getActivity()).onItemSelected(movieUri, movieKey);
                 }
@@ -118,9 +123,6 @@ public class MainMovieFragment extends Fragment implements LoaderManager.LoaderC
 
         if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
             mState = savedInstanceState.getParcelable(SELECTED_KEY);
-            //mGridView.onRestoreInstanceState(mState);
-//            mPosition = savedInstanceState.getInt(SELECTED_KEY);
-//            Log.d(LOG_TAG, "load position: " + mPosition);
         }
 
         return rootView;
@@ -159,19 +161,22 @@ public class MainMovieFragment extends Fragment implements LoaderManager.LoaderC
 
     }
 
+
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mPosterAdapter.swapCursor(data);
-//        if(data.moveToFirst()) {
+//        if (mDefaultId == 0 && mDefaultMovieId == 0) {
+//            if (data.moveToFirst()) {
 //
-//            int idIndex = data.getColumnIndex(MovieContract.MovieEntry._ID);
-//            int  id = data.getInt(idIndex);
+//                int idIndex = data.getColumnIndex(MovieContract.MovieEntry._ID);
+//                mDefaultId = data.getInt(idIndex);
 //
-//            int movieIdIndex = data.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_ID);
-//            long movieId = data.getLong(movieIdIndex);
+//                int movieIdIndex = data.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_ID);
+//                mDefaultMovieId = data.getLong(movieIdIndex);
 //
-//            Uri defaultUri = MovieContract.MovieEntry.buildMovieItemUriFromId(id);
-//            ((ShowMovieDetailCallBack) getActivity()).onItemSelected(defaultUri, movieId);
+//                Uri defaultUri = MovieContract.MovieEntry.buildMovieItemUriFromId(mDefaultId);
+//                ((ShowMovieDetailCallBack) getActivity()).onItemSelected(defaultUri, mDefaultMovieId);
+//            }
 //        }
 //        if(mGridView.getAdapter().getCount() > 0){
 //            mGridView.performItemClick(null,0, 0);
