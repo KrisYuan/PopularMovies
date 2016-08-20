@@ -19,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.awesomekris.android.app.popularmovies.data.MovieContract;
+import com.awesomekris.android.app.popularmovies.sync.PopularMoviesSyncAdapter;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -217,6 +218,7 @@ public class MainMovieFragment extends Fragment implements LoaderManager.LoaderC
         //TODO only at refresh button clicked
         FetchDataTask movieTask = new FetchDataTask(getActivity());
         movieTask.execute(mRequest, FetchDataTask.MOVIE_POSTER);
+        PopularMoviesSyncAdapter.syncImmediately(getActivity());
         //reload data
         onSortChanged();
     }

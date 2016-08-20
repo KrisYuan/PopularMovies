@@ -10,6 +10,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.awesomekris.android.app.popularmovies.sync.PopularMoviesSyncAdapter;
+
 public class MainMovieActivity extends AppCompatActivity implements MainMovieFragment.ShowMovieDetailCallBack{
 
     private static final String MOVIE_DETAIL_FRAGMENT_TAG = "MDFT";
@@ -40,6 +42,8 @@ public class MainMovieActivity extends AppCompatActivity implements MainMovieFra
                 //TODO sync when first launched
                 updateMovieDataFromInternet();
             }
+
+            PopularMoviesSyncAdapter.initializeSyncAdapter(this);
 
         }
 
