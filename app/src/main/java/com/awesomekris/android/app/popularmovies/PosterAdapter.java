@@ -66,7 +66,6 @@ public class PosterAdapter extends CursorAdapter {
         int posterPathIndex = cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_POSTER_PATH);
         final String posterPath = cursor.getString(posterPathIndex);
 
-        //System.out.println(posterPath);
 
         //TODO callback
         Picasso.with(mContext).load(posterPath).into(viewHolder.movieImageView);

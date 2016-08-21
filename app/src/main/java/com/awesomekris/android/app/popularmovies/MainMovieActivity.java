@@ -32,10 +32,13 @@ public class MainMovieActivity extends AppCompatActivity implements MainMovieFra
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.detail_movie_container, new DetailFragment(), MOVIE_DETAIL_FRAGMENT_TAG)
                         .commit();
+
             }else{
                 mTwoPane = false;
-                getSupportActionBar().setElevation(0f);
             }
+
+            MainMovieFragment mainMovieFragment = (MainMovieFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_movie_poster);
+            mainMovieFragment.setUseTodayLayout(mTwoPane);
 
             if(savedInstanceState == null){
                 //TODO only call updateFromInternet when click refresh
@@ -47,14 +50,6 @@ public class MainMovieActivity extends AppCompatActivity implements MainMovieFra
 
         }
 
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
     }
 
     @Override
@@ -66,17 +61,12 @@ public class MainMovieActivity extends AppCompatActivity implements MainMovieFra
             updateMovieDataFromInternet();
 
         }
-//        DetailFragment df = (DetailFragment)getSupportFragmentManager().findFragmentByTag(MOVIE_DETAIL_FRAGMENT_TAG);
-//        if (null != df){
-//            //TODO Update Movie Data According to MainMovieFragement
-//            df.onSortChanged();
-//
-//        }
         mSort = sort;
     }
 
 
     private void updateMovieDataFromInternet(){
+
         MainMovieFragment mmaf = (MainMovieFragment)getSupportFragmentManager()
                 .findFragmentById(R.id.fragment_movie_poster);
         if(null != mmaf){
@@ -85,7 +75,7 @@ public class MainMovieActivity extends AppCompatActivity implements MainMovieFra
 
         if(mTwoPane){
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.detail_movie_container, new MainMovieFragment(),MOVIE_DETAIL_FRAGMENT_TAG)
+                    .replace(R.id.detail_movie_container, new MainMovieFragment(), MOVIE_DETAIL_FRAGMENT_TAG)
                     .commit();
         }
 
@@ -93,26 +83,23 @@ public class MainMovieActivity extends AppCompatActivity implements MainMovieFra
 
 
     @Override
-    public void onItemSelected(Uri movieDetailUri, long movie_id) {
-        if (mTwoPane){
-
+    public void onItemSelected(Uri movieDetailUri, boolean useTwoPane) {
+        mTwoPane = useTwoPane;
+        if(findViewById(R.id.detail_movie_container) != null){
             Bundle args = new Bundle();
             args.putParcelable(DetailFragment.DETAIL_URI,movieDetailUri);
-            args.putLong(DetailFragment.DETAIL_MOVIE_ID,movie_id);
+            //args.putLong(DetailFragment.DETAIL_MOVIE_ID,movie_id);
             DetailFragment fragment = new DetailFragment();
-            //DetailFragment fragment = (DetailFragment)getSupportFragmentManager().findFragmentByTag(MOVIE_DETAIL_FRAGMENT_TAG);
             fragment.setArguments(args);
-            //fragment.reSetUriAndId(movieDetailUri,movie_id);
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.detail_movie_container,fragment,MOVIE_DETAIL_FRAGMENT_TAG)
+                    .replace(R.id.detail_movie_container, fragment, MOVIE_DETAIL_FRAGMENT_TAG)
                     .commit();
-        }
-        else{
+        }else{
             Intent intent = new Intent(this,DetailActivity.class);
             intent.setData(movieDetailUri);
-            Bundle bundle = new Bundle();
-            bundle.putLong(DetailFragment.DETAIL_MOVIE_ID,movie_id);
-            intent.putExtra(DetailFragment.DETAIL_MOVIE_ID,bundle);
+            //Bundle bundle = new Bundle();
+            //bundle.putLong(DetailFragment.DETAIL_MOVIE_ID,movie_id);
+            //intent.putExtra(DetailFragment.DETAIL_MOVIE_ID,bundle);
             startActivity(intent);
         }
     }
@@ -126,12 +113,9 @@ public class MainMovieActivity extends AppCompatActivity implements MainMovieFra
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
@@ -146,4 +130,5 @@ public class MainMovieActivity extends AppCompatActivity implements MainMovieFra
     public Intent getParentActivityIntent() {
         return super.getParentActivityIntent().addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
     }
+
 }

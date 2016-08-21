@@ -113,7 +113,7 @@ public class MovieContract {
         public static Uri buildMovieItemUriFromId(long id) {
             return ContentUris.withAppendedId(CONTENT_URI,id);
         }
-        //.../movie/detail/id
+        //.../movie/detail/movie_id
         public static Uri buildDetailMovieItemUri(long id) {
             Uri detailUriPath = CONTENT_URI.buildUpon().appendPath(PATH_DETAIL).build();
             return ContentUris.withAppendedId(detailUriPath, id);
@@ -158,7 +158,7 @@ public class MovieContract {
             }
         }
 
-        //parse  .../movie/id
+        //parse  .../movie/movie_id
         public static long getIdFromUri(Uri uri){
             return Long.parseLong(uri.getLastPathSegment());
         }

@@ -19,7 +19,6 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.awesomekris.android.app.popularmovies.data.MovieContract;
-import com.awesomekris.android.app.popularmovies.sync.PopularMoviesSyncAdapter;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -39,22 +38,22 @@ public class MainMovieFragment extends Fragment implements LoaderManager.LoaderC
     private String mSort;
     private String mRequest;
     private Parcelable mState;
-    private long mDefaultId=0;
-    private long mDefaultMovieId=0;
+    private boolean mUseTwoPaneLayout;
 
     private static final String SORT_POPULARITY = "popular";
     private static final String SORT_TOP_RATED = "top_rated";
     private static final String SORT_FAVORITE = "favorite";
 
 
-
-
     public MainMovieFragment() {
     }
 
+    public void setUseTodayLayout(boolean useTwoPaneLayout){
+        mUseTwoPaneLayout = useTwoPaneLayout;
+    }
     public interface ShowMovieDetailCallBack {
         // when poster was clicked, call this method
-        void onItemSelected(Uri movieDetailUri, long movie_id);
+        void onItemSelected(Uri movieDetailUri, boolean useTwoPane);
 
     }
 
@@ -100,24 +99,19 @@ public class MainMovieFragment extends Fragment implements LoaderManager.LoaderC
                 Cursor movieCursor = (Cursor) parent.getAdapter().getItem(position);
                 if (movieCursor != null) {
 
-                    //get _ID
-                    int movieIdIndex = movieCursor.getColumnIndex(MovieContract.MovieEntry._ID);
-                    int movieId = movieCursor.getInt(movieIdIndex);
                     //get movie id
-                    int movieIndex = movieCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_ID);
-                    long movieKey = movieCursor.getLong(movieIndex);
+                    int movieIdIndex = movieCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_ID);
+                    long movieId = movieCursor.getLong(movieIdIndex);
 
                     //get trailer and review from internet according to  movid id of the selected movie
                     FetchDataTask fetchTrailerTask = new FetchDataTask(getActivity());
-                    fetchTrailerTask.execute(Long.toString(movieKey),FetchDataTask.MOVIE_TRAILER );
+                    fetchTrailerTask.execute(Long.toString(movieId),FetchDataTask.MOVIE_TRAILER );
                     FetchDataTask fetchReviewTask = new FetchDataTask(getActivity());
-                    fetchReviewTask.execute(Long.toString(movieKey),FetchDataTask.MOVIE_REVIEW );
+                    fetchReviewTask.execute(Long.toString(movieId),FetchDataTask.MOVIE_REVIEW );
 
-                    mDefaultId = movieId;
-                    mDefaultMovieId = movieKey;
 
-                    Uri movieUri = MovieContract.MovieEntry.buildMovieItemUriFromId(movieId);
-                    ((ShowMovieDetailCallBack)getActivity()).onItemSelected(movieUri, movieKey);
+                    Uri movieUri = MovieContract.MovieEntry.buildDetailMovieItemUri(movieId);
+                    ((ShowMovieDetailCallBack)getActivity()).onItemSelected(movieUri, mUseTwoPaneLayout);
                 }
             }
         });
@@ -166,22 +160,6 @@ public class MainMovieFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mPosterAdapter.swapCursor(data);
-//        if (mDefaultId == 0 && mDefaultMovieId == 0) {
-//            if (data.moveToFirst()) {
-//
-//                int idIndex = data.getColumnIndex(MovieContract.MovieEntry._ID);
-//                mDefaultId = data.getInt(idIndex);
-//
-//                int movieIdIndex = data.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_ID);
-//                mDefaultMovieId = data.getLong(movieIdIndex);
-//
-//                Uri defaultUri = MovieContract.MovieEntry.buildMovieItemUriFromId(mDefaultId);
-//                ((ShowMovieDetailCallBack) getActivity()).onItemSelected(defaultUri, mDefaultMovieId);
-//            }
-//        }
-//        if(mGridView.getAdapter().getCount() > 0){
-//            mGridView.performItemClick(null,0, 0);
-//        }
         if (mState != null) {
             mGridView.onRestoreInstanceState(mState);
             Log.d(LOG_TAG, "use position: " + mState);
@@ -190,7 +168,9 @@ public class MainMovieFragment extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+
         mPosterAdapter.swapCursor(null);
+
     }
 
 
@@ -218,7 +198,6 @@ public class MainMovieFragment extends Fragment implements LoaderManager.LoaderC
         //TODO only at refresh button clicked
         FetchDataTask movieTask = new FetchDataTask(getActivity());
         movieTask.execute(mRequest, FetchDataTask.MOVIE_POSTER);
-        PopularMoviesSyncAdapter.syncImmediately(getActivity());
         //reload data
         onSortChanged();
     }
@@ -230,11 +209,6 @@ public class MainMovieFragment extends Fragment implements LoaderManager.LoaderC
         //TODO use state instead of position
         mState = mGridView.onSaveInstanceState();
         outState.putParcelable(SELECTED_KEY,mState);
-//        mPosition = mGridView.getFirstVisiblePosition();
-//        if (mPosition != RecyclerView.NO_POSITION) {
-//            outState.putInt(SELECTED_KEY, mPosition);
-//            Log.d(LOG_TAG, "save position: " + mPosition);
-//        }
         super.onSaveInstanceState(outState);
     }
 

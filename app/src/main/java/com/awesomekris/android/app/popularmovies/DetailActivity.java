@@ -16,7 +16,6 @@ public class DetailActivity extends AppCompatActivity {
 
         Bundle arguments = new Bundle();
         arguments.putParcelable(DetailFragment.DETAIL_URI, getIntent().getData());
-        arguments.putLong(DetailFragment.DETAIL_MOVIE_ID, getIntent().getBundleExtra(DetailFragment.DETAIL_MOVIE_ID).getLong(DetailFragment.DETAIL_MOVIE_ID));
 
         DetailFragment fragment = new DetailFragment();
         fragment.setArguments(arguments);
@@ -27,14 +26,6 @@ public class DetailActivity extends AppCompatActivity {
                     .commit();
         }
 
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 

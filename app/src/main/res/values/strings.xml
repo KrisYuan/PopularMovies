@@ -20,4 +20,10 @@
     <string name="sync_account_type">popularmovies.example.com</string>
     <string name="content_authority">com.awesomekris.android.app.popularmovies</string>
 
+    <!-- Empty Weather Database -->
+    <string name="empty_movie_detail">No Movie Detail Information Available</string>
+    <string name="empty_movie_detail_no_network">No movie detail information available. The network is not available to fetch movie data.</string>
+
+
+
 </resources>

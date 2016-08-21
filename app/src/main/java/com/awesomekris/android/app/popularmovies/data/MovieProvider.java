@@ -67,7 +67,7 @@ public class MovieProvider extends ContentProvider {
         // .../review/search?review_movie_id=moive_id
         matcher.addURI(authority, MovieContract.PATH_REVIEW + "/" + MovieContract.ReviewEntry.PATH_SEARCH, REVIEW_SEARCH_BY_MOVIE_ID);
 
-        // .../movie/detail/id
+        // .../movie/detail/movie_id
         matcher.addURI(authority,
                 MovieContract.PATH_MOVIE + "/" + MovieContract.MovieEntry.PATH_DETAIL + "/#",
                 MOVIE_DETAIL);
@@ -302,12 +302,9 @@ public class MovieProvider extends ContentProvider {
                 break;
             case MOVIE_DETAIL:
                 Long movie_id = MovieContract.MovieEntry.getIdFromUri(uri);
-                Cursor cursorDetail = query(MovieContract.MovieEntry.buildMovieItemUriFromId(movie_id), MovieContract.MovieEntry.MOVIE_COLUMNS, null, null, null);
-                //Cursor assist = query(MovieContract.MovieEntry.build)
-                //int movieIdIndex = cursorDetail.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_ID);
-                //String movieKey = cursorDetail.getString(movieIdIndex);
-                Cursor cursorTrailer = query(MovieContract.TrailerEntry.buildTrailerSearchByfMovieIdUri(278927), MovieContract.TrailerEntry.TRAILER_COLUMNS, selection, selectionArgs, sortOrder);
-                Cursor cursorReview = query(MovieContract.ReviewEntry.buildReviewSearchByMovieId(278927), MovieContract.ReviewEntry.REVIEW_COLUMNS, selection, selectionArgs, sortOrder);
+                Cursor cursorDetail = query(MovieContract.MovieEntry.buildMovieSearchByMovieIdUri(movie_id), MovieContract.MovieEntry.MOVIE_COLUMNS, null, null, null);
+                Cursor cursorTrailer = query(MovieContract.TrailerEntry.buildTrailerSearchByfMovieIdUri(movie_id), MovieContract.TrailerEntry.TRAILER_COLUMNS, null, null, null);
+                Cursor cursorReview = query(MovieContract.ReviewEntry.buildReviewSearchByMovieId(movie_id), MovieContract.ReviewEntry.REVIEW_COLUMNS, null, null, null);
                 Cursor[] cursors = new Cursor[]{cursorDetail, cursorTrailer, cursorReview};
                 retCursor = new MergeCursor(cursors);
                 break;

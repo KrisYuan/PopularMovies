@@ -3,6 +3,7 @@ package com.awesomekris.android.app.popularmovies;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -14,41 +15,118 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.awesomekris.android.app.popularmovies.data.MovieContract;
+import com.awesomekris.android.app.popularmovies.library.RecyclerViewCursorAdapter;
 import com.squareup.picasso.Picasso;
-
-import java.util.ArrayList;
 
 /**
  * Created by kris on 16/8/17.
  */
-public class DetailWrapperRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class DetailWrapperRecyclerViewAdapter extends RecyclerViewCursorAdapter<RecyclerView.ViewHolder> {
 
     private static final String LOG_TAG = DetailWrapperRecyclerViewAdapter.class.getSimpleName();
     private static final int VIEW_TYPE_MOVIE_DETAIL = 0;
     private static final int VIEW_TYPE_TRAILER = 1;
     private static final int VIEW_TYPE_REVIEW = 2;
-    //private static final int MOVIE_DETAIL_LOADER = 2;
+
 
     private static final String uFavoriteByMovieIdSelection = MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ? ";
 
-    private Context mContext;
+
+    private String mMovieId;
     private String mTrailerKey;
     private int isFavorite;
-    private Movie mMovie;
-    private ArrayList<Trailer> mTrailers;
-    private ArrayList<Review> mReviews;
+    private int mNumOfTrailer;
 
-//    public static interface DetailWrapperCallback{
-//        void onItemSelected(Uri movieDetailUri);
-//
-//    }
-
-    public DetailWrapperRecyclerViewAdapter(Context context, Movie movie,ArrayList<Trailer> trailers, ArrayList<Review> reviews) {
-        mContext = context;
-        mMovie = movie;
-        mTrailers = trailers;
-        mReviews = reviews;
+    public DetailWrapperRecyclerViewAdapter(Context context, Cursor c, int flags) {
+        super(context, c, flags);
     }
+
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, Cursor cursor) {
+
+        if(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_TITLE) != -1) {
+
+            //get movie_id
+            int movieIdIndex = cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_ID);
+            long movieId = cursor.getLong(movieIdIndex);
+            mMovieId = Long.toString(movieId);
+
+            //set title
+            int titleIndex = cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_TITLE);
+            String title = cursor.getString(titleIndex);
+            ((DetailViewHolder) holder).mTitle.setText(title);
+
+            //set poster
+            int posterIndex = cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_POSTER_PATH);
+            String poster = cursor.getString(posterIndex);
+            Picasso.with(mContext).load(poster).into(((DetailViewHolder) holder).mImageView);
+
+            //set release date
+            int releaseDateIndex = cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_RELEASE_DATE);
+            String releaseDate = cursor.getString(releaseDateIndex);
+            ((DetailViewHolder) holder).mReleaseDate.setText(releaseDate);
+
+            //set vote average
+            int voteAverageIndex = cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE);
+            String voteAverage = cursor.getString(voteAverageIndex);
+            ((DetailViewHolder) holder).mVoteAverage.setText(voteAverage);
+
+            //set overview
+            int overviewIndex = cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_OVERVIEW);
+            String overview = cursor.getString(overviewIndex);
+            ((DetailViewHolder) holder).mOverView.setText(overview);
+
+            //set favorite button
+            int favoriteIndex = cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_FAVORITE);
+            int favorite = cursor.getInt(favoriteIndex);
+            isFavorite = Integer.valueOf(favorite);
+
+            if (isFavorite == 1) {
+                ((DetailViewHolder) holder).mFavorite.setText("CANCEL FROM FAVORITE");
+            } else {
+                ((DetailViewHolder) holder).mFavorite.setText("ADD TO FAVORITE");
+            }
+        }
+
+            if (cursor.getColumnIndex(MovieContract.TrailerEntry.COLUMN_YOUTUBE_KEY) != -1) {
+
+
+                //set trailer title
+                int titleIndex = cursor.getColumnIndex(MovieContract.TrailerEntry.COLUMN_TRAILER_TITLE);
+                String title = cursor.getString(titleIndex);
+                ((TrailerViewHolder)holder).mTitleTextView.setText(title);
+
+                //get trailer key
+                int keyIndex = cursor.getColumnIndex(MovieContract.TrailerEntry.COLUMN_YOUTUBE_KEY);
+                mTrailerKey = cursor.getString(keyIndex);
+
+            }
+
+
+            if(cursor.getColumnIndex(MovieContract.ReviewEntry.COLUMN_REVIEW_AUTHOR) != -1) {
+
+                //set review author
+                int authorIndex = cursor.getColumnIndex(MovieContract.ReviewEntry.COLUMN_REVIEW_AUTHOR);
+                String author = cursor.getString(authorIndex);
+                ((ReviewViewHolder)holder).mAuthorTextView.setText(author);
+
+                //set review content
+                int contentIndex = cursor.getColumnIndex(MovieContract.ReviewEntry.COLUMN_REVIEW_CONTENT);
+                String content = cursor.getString(contentIndex);
+                ((ReviewViewHolder)holder).mContentTextView.setText(content);
+            }
+
+        }
+
+    @Override
+    protected void onContentChanged() {
+
+    }
+
+    public void setNumOfTrailer(int numOfTrailer) {
+        mNumOfTrailer = numOfTrailer;
+    }
+
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
@@ -85,79 +163,17 @@ public class DetailWrapperRecyclerViewAdapter extends RecyclerView.Adapter<Recyc
 
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-
-        switch (getItemViewType(position)){
-            case VIEW_TYPE_MOVIE_DETAIL:
-
-                Movie movie = mMovie;
-                //set title
-                ((DetailViewHolder) holder).mTitle.setText(movie.getTitle());
-
-                //set poster
-                Picasso.with(mContext).load(movie.getPoster()).into(((DetailViewHolder) holder).mImageView);
-
-                //set release date
-                ((DetailViewHolder) holder).mReleaseDate.setText(movie.getRelease_date());
-
-                //set vote average
-                ((DetailViewHolder) holder).mVoteAverage.setText(movie.getVote_average());
-
-                //set overview
-                ((DetailViewHolder) holder).mOverView.setText(movie.getOverview());
-
-                //set favorite button
-                isFavorite = Integer.valueOf(movie.getFavorite());
-
-                if (isFavorite == 1){
-                    ((DetailViewHolder) holder).mFavorite.setText("CANCEL FROM FAVORITE");
-                }else{
-                    ((DetailViewHolder) holder).mFavorite.setText("ADD TO FAVORITE");
-                }
-                break;
-            case VIEW_TYPE_TRAILER:
-                Trailer trailer = mTrailers.get(position-1);
-                //set trailer title
-                ((TrailerViewHolder)holder).mTitleTextView.setText(trailer.getName());
-
-                //get trailer key
-                mTrailerKey = trailer.getKey();
-
-
-                break;
-            case VIEW_TYPE_REVIEW:
-                Review review = mReviews.get(position - mTrailers.size() -1);
-                //set review author
-                ((ReviewViewHolder)holder).mAuthorTextView.setText(review.getName());
-
-                //set review content
-                ((ReviewViewHolder)holder).mContentTextView.setText(review.getComment());
-
-                break;
-        }
-
-
-    }
-
-
-    @Override
     public int getItemViewType(int position) {
 
-        if (position == 0)
+        if (position == 0 )
             return VIEW_TYPE_MOVIE_DETAIL;
 
-        if (position > 0 && position < mTrailers.size() + 1)
+        if (position < mNumOfTrailer + 1)
             return VIEW_TYPE_TRAILER;
 
         return VIEW_TYPE_REVIEW;
     }
 
-
-    @Override
-    public int getItemCount() {
-
-        return mTrailers.size() + mReviews.size() + 1;
-    }
 
     public class DetailViewHolder extends RecyclerView.ViewHolder{
         public final ImageView mImageView;
@@ -180,7 +196,7 @@ public class DetailWrapperRecyclerViewAdapter extends RecyclerView.Adapter<Recyc
                 public void onClick(View v) {
                     int updated = 0;
                     ContentValues movieValues = new ContentValues();
-                    String[] selectionArgs = new String[]{mMovie.getMovie_id()};
+                    String[] selectionArgs = new String[]{mMovieId};
 
                     if(isFavorite == 0){
                         mFavorite.setText("CANCEL FROM FAVORITE");
@@ -233,8 +249,5 @@ public class DetailWrapperRecyclerViewAdapter extends RecyclerView.Adapter<Recyc
 
         }
     }
-
-
-
 
 }
