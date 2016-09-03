@@ -19,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.awesomekris.android.app.popularmovies.data.MovieContract;
+import com.awesomekris.android.app.popularmovies.sync.PopularMoviesSyncAdapter;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -26,19 +27,13 @@ import com.awesomekris.android.app.popularmovies.data.MovieContract;
 public class MainMovieFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,SharedPreferences.OnSharedPreferenceChangeListener{
 
     public static final String LOG_TAG = MainMovieFragment.class.getSimpleName();
-    //public static final String DETAIL_URI = "detail_uri";
-    //public static final String GRID_VIEW_STATE = "grid_movie_state";
-
-
     private static final String SELECTED_KEY = "selected_position";
     private static final int MOVIE_LOADER_ID=1;
 
     private GridView mGridView;
     private PosterAdapter mPosterAdapter;
     private String mSort;
-    private String mRequest;
     private Parcelable mState;
-    private boolean mUseTwoPaneLayout;
 
     private static final String SORT_POPULARITY = "popular";
     private static final String SORT_TOP_RATED = "top_rated";
@@ -48,12 +43,10 @@ public class MainMovieFragment extends Fragment implements LoaderManager.LoaderC
     public MainMovieFragment() {
     }
 
-    public void setUseTodayLayout(boolean useTwoPaneLayout){
-        mUseTwoPaneLayout = useTwoPaneLayout;
-    }
+
     public interface ShowMovieDetailCallBack {
         // when poster was clicked, call this method
-        void onItemSelected(Uri movieDetailUri, boolean useTwoPane);
+        void onItemSelected(Uri movieDetailUri);
 
     }
 
@@ -65,7 +58,7 @@ public class MainMovieFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onStart() {
         super.onStart();
-        getMoviesFromInternet();
+        onSortChanged();
     }
     @Override
     public void onResume() {
@@ -84,11 +77,12 @@ public class MainMovieFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView =  inflater.inflate(R.layout.fragment_main_movie, container, false);
 
+        View rootView =  inflater.inflate(R.layout.fragment_main_movie, container, false);
+        PopularMoviesSyncAdapter.syncImmediately(getActivity());
 
         mSort = Utility.getPreferredSort(getContext());
-        getMoviesFromInternet();
+        onSortChanged();
 
         mPosterAdapter = new PosterAdapter(getActivity(),null,0);
         mGridView = (GridView)rootView.findViewById(R.id.gridView_movie);
@@ -99,19 +93,11 @@ public class MainMovieFragment extends Fragment implements LoaderManager.LoaderC
                 Cursor movieCursor = (Cursor) parent.getAdapter().getItem(position);
                 if (movieCursor != null) {
 
-                    //get movie id
                     int movieIdIndex = movieCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_ID);
                     long movieId = movieCursor.getLong(movieIdIndex);
 
-                    //get trailer and review from internet according to  movid id of the selected movie
-                    FetchDataTask fetchTrailerTask = new FetchDataTask(getActivity());
-                    fetchTrailerTask.execute(Long.toString(movieId),FetchDataTask.MOVIE_TRAILER );
-                    FetchDataTask fetchReviewTask = new FetchDataTask(getActivity());
-                    fetchReviewTask.execute(Long.toString(movieId),FetchDataTask.MOVIE_REVIEW );
-
-
                     Uri movieUri = MovieContract.MovieEntry.buildDetailMovieItemUri(movieId);
-                    ((ShowMovieDetailCallBack)getActivity()).onItemSelected(movieUri, mUseTwoPaneLayout);
+                    ((ShowMovieDetailCallBack)getActivity()).onItemSelected(movieUri);
                 }
             }
         });
@@ -168,9 +154,7 @@ public class MainMovieFragment extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-
         mPosterAdapter.swapCursor(null);
-
     }
 
 
@@ -178,35 +162,9 @@ public class MainMovieFragment extends Fragment implements LoaderManager.LoaderC
         getLoaderManager().restartLoader(MOVIE_LOADER_ID,null,this);
     }
 
-    private String getRequestType(String sort){
-        switch (sort) {
-            case SORT_POPULARITY:
-                return "/popular";
-            case SORT_TOP_RATED:
-                return "/top_rated";
-            case SORT_FAVORITE:
-                return null;
-            default:
-                throw new UnsupportedOperationException("Unknown sort: " + sort);
-        }
-    }
-
-
-    public void getMoviesFromInternet(){
-        mSort = Utility.getPreferredSort(getContext());
-        mRequest = getRequestType(mSort);
-        //TODO only at refresh button clicked
-        FetchDataTask movieTask = new FetchDataTask(getActivity());
-        movieTask.execute(mRequest, FetchDataTask.MOVIE_POSTER);
-        //reload data
-        onSortChanged();
-    }
-
-
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        //TODO use state instead of position
         mState = mGridView.onSaveInstanceState();
         outState.putParcelable(SELECTED_KEY,mState);
         super.onSaveInstanceState(outState);

@@ -328,7 +328,6 @@ public abstract class RecyclerViewCursorAdapter<VH extends RecyclerView.ViewHold
         public void onInvalidated() {
             mDataValid = false;
             notifyDataSetChanged();
-//            notifyDataSetInvalidated();
         }
     }
 }
