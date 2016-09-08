@@ -34,7 +34,7 @@ public class PosterAdapter extends CursorAdapter {
 
     public PosterAdapter(Context context, Cursor c, int flags){
         super(context, c, flags);
-        Log.d(LOG_TAG, "PosterAdapter");
+        Log.d(LOG_TAG, "PosterAdapter created");
         mContext = context;
 
     }
@@ -46,7 +46,6 @@ public class PosterAdapter extends CursorAdapter {
 
         int layoutId = R.layout.grid_item_movie;
 
-        Log.d(LOG_TAG,"In new View");
 
         View view = LayoutInflater.from(context).inflate(layoutId,parent,false);
         ViewHolder viewHolder = new ViewHolder(view);
@@ -61,7 +60,6 @@ public class PosterAdapter extends CursorAdapter {
 
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-        Log.d(LOG_TAG, "In bind View");
 
         int posterPathIndex = cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_POSTER_PATH);
         final String posterPath = cursor.getString(posterPathIndex);

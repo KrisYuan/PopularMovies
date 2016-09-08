@@ -81,8 +81,8 @@ public class MainMovieFragment extends Fragment implements LoaderManager.LoaderC
         View rootView =  inflater.inflate(R.layout.fragment_main_movie, container, false);
         PopularMoviesSyncAdapter.syncImmediately(getActivity());
 
-        mSort = Utility.getPreferredSort(getContext());
-        onSortChanged();
+        //mSort = Utility.getPreferredSort(getContext());
+        //onSortChanged();
 
         mPosterAdapter = new PosterAdapter(getActivity(),null,0);
         mGridView = (GridView)rootView.findViewById(R.id.gridView_movie);
@@ -129,6 +129,7 @@ public class MainMovieFragment extends Fragment implements LoaderManager.LoaderC
             case SORT_TOP_RATED:
                 sortOrder = MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE + " DESC" + " LIMIT 20";
                 uri = MovieContract.MovieEntry.buildTopRatedMoviesUri();
+                Log.v(LOG_TAG, "use top rate uri");
                 break;
             case SORT_FAVORITE:
                 sortOrder = MovieContract.MovieEntry.COLUMN_FAVORITE + " DESC";
@@ -145,10 +146,10 @@ public class MainMovieFragment extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        Log.v(LOG_TAG, "uri size is " + data.getCount());
         mPosterAdapter.swapCursor(data);
         if (mState != null) {
             mGridView.onRestoreInstanceState(mState);
-            Log.d(LOG_TAG, "use position: " + mState);
         }
     }
 
@@ -172,8 +173,11 @@ public class MainMovieFragment extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        Log.v(LOG_TAG, "preference change, invoke restartLoader");
+
         if ( key.equals(getString(R.string.pref_sort_key)) ) {
             onSortChanged();
+            Log.v(LOG_TAG, "uri change, invoke restartLoader");
         }
     }
 

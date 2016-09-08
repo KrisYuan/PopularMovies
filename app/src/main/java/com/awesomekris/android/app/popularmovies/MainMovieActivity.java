@@ -38,9 +38,6 @@ public class MainMovieActivity extends AppCompatActivity implements MainMovieFra
                 //updateMovieDataFromInternet();
             }
 
-            MainMovieFragment mainMovieFragment = (MainMovieFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_movie_poster);
-            //mainMovieFragment.setUseTodayLayout(mTwoPane);
-
         } else{
             mTwoPane = false;
         }

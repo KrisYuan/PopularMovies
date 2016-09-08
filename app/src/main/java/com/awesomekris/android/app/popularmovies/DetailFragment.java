@@ -99,7 +99,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         if (savedInstanceState != null && savedInstanceState.containsKey(CURRENT_KEY)) {
             mState = savedInstanceState.getParcelable(CURRENT_KEY);
-
         }
 
         return rootView;
