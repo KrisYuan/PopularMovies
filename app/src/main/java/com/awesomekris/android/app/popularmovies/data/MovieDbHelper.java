@@ -51,7 +51,8 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                 MovieContract.ReviewEntry._ID + " INTEGER PRIMARY KEY NOT NULL, " +
                 MovieContract.ReviewEntry.COLUMN_MOVIE_ID + " REAL NOT NULL, " +
                 MovieContract.ReviewEntry.COLUMN_REVIEW_AUTHOR + " TEXT NOT NULL, " +
-                MovieContract.ReviewEntry.COLUMN_REVIEW_CONTENT + " TEXT NOT NULL "
+                MovieContract.ReviewEntry.COLUMN_REVIEW_CONTENT + " TEXT NOT NULL, " +
+                MovieContract.ReviewEntry.COLUMN_REVIEW_ID + " TEXT UNIQUE NOT NULL "
                 + ");";
 //                " FOREIGN KEY (" + MovieContract.ReviewEntry.COLUMN_MOVIE_ID + ") REFERENCES " +
 //                MovieContract.MovieEntry.TABLE_NAME + " (" + MovieContract.MovieEntry.COLUMN_MOVIE_ID + ")";

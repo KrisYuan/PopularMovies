@@ -260,6 +260,7 @@ public class MovieContract {
     *               movie_id (foreign key)
     *               author
     *               content
+    *               review_id
     * */
 
     public static final class ReviewEntry implements BaseColumns {
@@ -277,18 +278,21 @@ public class MovieContract {
         public static final String COLUMN_MOVIE_ID = "review_movie_id";
         public static final String COLUMN_REVIEW_AUTHOR = "review_author";
         public static final String COLUMN_REVIEW_CONTENT = "review_content";
+        public static final String COLUMN_REVIEW_ID = "review_id";
 
         public static final String[] REVIEW_COLUMNS = {
                 _ID,
                 COLUMN_MOVIE_ID,
                 COLUMN_REVIEW_AUTHOR,
-                COLUMN_REVIEW_CONTENT
+                COLUMN_REVIEW_CONTENT,
+                COLUMN_REVIEW_ID
         };
 
         public static final int COLUMN_INDEX_ID = 0;
         public static final int COLUMN_INDEX_MOVIE_ID = 1;
         public static final int COLUMN_INDEX_REVIEW_AUTHOR = 2;
         public static final int COLUMN_INDEX_REVIEW_CONTENT = 3;
+        public static final int COLUMN_INDEX_REVIEW_ID = 4;
 
         /*
         dir

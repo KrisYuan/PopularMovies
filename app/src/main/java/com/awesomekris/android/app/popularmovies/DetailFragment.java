@@ -74,17 +74,16 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
+        mUri = null;
 
         Bundle arguments = getArguments();
         if (arguments != null) {
             mUri = arguments.getParcelable(DetailFragment.DETAIL_URI);
         }
         else{
-            if (getActivity().getIntent() == null || getActivity().getIntent().getData() == null)
-            {
-                return null;
+            if (getActivity().getIntent() != null && getActivity().getIntent().getData() != null) {
+                mUri = getActivity().getIntent().getData();
             }
-            mUri = getActivity().getIntent().getData();
         }
 
 
@@ -100,7 +99,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         if (savedInstanceState != null && savedInstanceState.containsKey(CURRENT_KEY)) {
             mState = savedInstanceState.getParcelable(CURRENT_KEY);
-
         }
 
         return rootView;
@@ -116,7 +114,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(getActivity(), mUri,null,null,null,null);
+        if (mUri != null)
+            return new CursorLoader(getActivity(), mUri,null,null,null,null);
+        else
+            return null;
     }
 
     @Override

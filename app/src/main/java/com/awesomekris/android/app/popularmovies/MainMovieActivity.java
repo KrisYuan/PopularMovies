@@ -33,22 +33,16 @@ public class MainMovieActivity extends AppCompatActivity implements MainMovieFra
                         .add(R.id.detail_movie_container, new DetailFragment(), MOVIE_DETAIL_FRAGMENT_TAG)
                         .commit();
 
-            }else{
-                mTwoPane = false;
-            }
-
-            MainMovieFragment mainMovieFragment = (MainMovieFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_movie_poster);
-            mainMovieFragment.setUseTodayLayout(mTwoPane);
-
-            if(savedInstanceState == null){
                 //TODO only call updateFromInternet when click refresh
                 //TODO sync when first launched
-                updateMovieDataFromInternet();
+                //updateMovieDataFromInternet();
             }
 
-            PopularMoviesSyncAdapter.initializeSyncAdapter(this);
-
+        } else{
+            mTwoPane = false;
         }
+
+        PopularMoviesSyncAdapter.initializeSyncAdapter(this);
 
     }
 
@@ -57,38 +51,27 @@ public class MainMovieActivity extends AppCompatActivity implements MainMovieFra
         super.onResume();
         String sort = Utility.getPreferredSort(this);
         if(sort != null && !sort.equals(mSort)){
-
-            updateMovieDataFromInternet();
-
+            onSortChanged();
         }
         mSort = sort;
     }
 
 
-    private void updateMovieDataFromInternet(){
-
+    private void onSortChanged(){
         MainMovieFragment mmaf = (MainMovieFragment)getSupportFragmentManager()
                 .findFragmentById(R.id.fragment_movie_poster);
         if(null != mmaf){
-            mmaf.getMoviesFromInternet();
+            mmaf.onSortChanged();
         }
-
-        if(mTwoPane){
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.detail_movie_container, new MainMovieFragment(), MOVIE_DETAIL_FRAGMENT_TAG)
-                    .commit();
-        }
-
     }
 
 
     @Override
-    public void onItemSelected(Uri movieDetailUri, boolean useTwoPane) {
-        mTwoPane = useTwoPane;
+    public void onItemSelected(Uri movieDetailUri) {
+
         if(findViewById(R.id.detail_movie_container) != null){
             Bundle args = new Bundle();
             args.putParcelable(DetailFragment.DETAIL_URI,movieDetailUri);
-            //args.putLong(DetailFragment.DETAIL_MOVIE_ID,movie_id);
             DetailFragment fragment = new DetailFragment();
             fragment.setArguments(args);
             getSupportFragmentManager().beginTransaction()
@@ -97,9 +80,6 @@ public class MainMovieActivity extends AppCompatActivity implements MainMovieFra
         }else{
             Intent intent = new Intent(this,DetailActivity.class);
             intent.setData(movieDetailUri);
-            //Bundle bundle = new Bundle();
-            //bundle.putLong(DetailFragment.DETAIL_MOVIE_ID,movie_id);
-            //intent.putExtra(DetailFragment.DETAIL_MOVIE_ID,bundle);
             startActivity(intent);
         }
     }
